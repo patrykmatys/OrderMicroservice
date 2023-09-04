@@ -5,11 +5,15 @@ import org.springframework.stereotype.Service;
 import org.thesis.models.Cart;
 import org.thesis.models.Order;
 import org.thesis.models.OrderHistory;
+import org.thesis.models.SimpleCart;
 import org.thesis.repositories.OrderHistoryRepository;
 import org.thesis.services.cart.CartService;
+import org.thesis.services.items.ItemsService;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -19,12 +23,17 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CartService cartService;
 
+    @Autowired
+    private ItemsService itemsService;
+
     @Override
     public OrderHistory saveOrder(String user) {
-        Cart cart = cartService.getCartByUser(user);
+        SimpleCart simpleCart = cartService.getCartByUser(user);
         OrderHistory orderHistory = getOrderHistory(user);
 
-        Order order = Order.createOrder(cart);
+        Cart cart = itemsService.getFullCart(simpleCart);
+
+        Order order = Order.createOrder(cart, getTotalPrice(cart));
         List<Order> orders = orderHistory.getOrders();
         orders.add(order);
 
@@ -43,5 +52,16 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return orderHistory;
+    }
+
+    private BigDecimal getTotalPrice (Cart cart) {
+        AtomicReference<BigDecimal> totalPrice = new AtomicReference<>(BigDecimal.ZERO);
+
+        cart.getItems().forEach((item, cartItem) -> {
+            BigDecimal itemPrice = cartItem.getPrice().multiply(BigDecimal.valueOf(cartItem.getAmount()));
+            totalPrice.updateAndGet(currentTotal -> currentTotal.add(itemPrice));
+        });
+
+        return totalPrice.get();
     }
 }

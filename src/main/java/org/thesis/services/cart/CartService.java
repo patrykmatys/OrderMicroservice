@@ -1,8 +1,8 @@
 package org.thesis.services.cart;
 
-import org.thesis.models.Cart;
+import org.thesis.models.SimpleCart;
 
-public interface CartService {
-    Cart getCartByUser(String user);
-    Cart emptyCart(String user);
+public interface CartService{
+    SimpleCart getCartByUser(String user);
+    SimpleCart emptyCart(String user);
 }

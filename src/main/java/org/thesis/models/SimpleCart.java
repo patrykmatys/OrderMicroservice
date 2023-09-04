@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.UUID;
 
 @Data
-public class Cart {
+public class SimpleCart {
     @Id
     private String user;
-    private HashMap<UUID, CartItem> items;
+    private HashMap<UUID, Integer> items;
 }

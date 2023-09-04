@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.thesis.models.Cart;
+import org.thesis.models.SimpleCart;
 
 @Service
 public class CartServiceImpl implements CartService{
@@ -15,20 +15,20 @@ public class CartServiceImpl implements CartService{
     private String cartMicroserviceUrl;
 
     @Override
-    public Cart getCartByUser(String user) {
+    public SimpleCart getCartByUser(String user) {
         String getCartUrl = cartMicroserviceUrl + "/" + user;
-        ResponseEntity<Cart> response = restTemplate.getForEntity(getCartUrl, Cart.class);
+        ResponseEntity<SimpleCart> response = restTemplate.getForEntity(getCartUrl, SimpleCart.class);
 
         return response.getBody();
     }
 
     @Override
-    public Cart emptyCart(String user) {
+    public SimpleCart emptyCart(String user) {
         String emptyCartUrl = cartMicroserviceUrl + "/remove/" + user;
-        ResponseEntity<Cart> response = restTemplate.postForEntity(
+        ResponseEntity<SimpleCart> response = restTemplate.postForEntity(
                 emptyCartUrl,
                 null,
-                Cart.class);
+                SimpleCart.class);
 
         return response.getBody();
     }
